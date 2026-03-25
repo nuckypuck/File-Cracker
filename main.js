@@ -12,12 +12,13 @@ function createWindow () {
     height: 620,
     minWidth: 700,
     minHeight: 500,
+    icon: path.join(__dirname, 'icon.ico'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    backgroundColor: '#f0f0ee',
+    backgroundColor: '#f8f8f7',
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     title: 'File Cracker — MDX Cyber Security Society'
   })
