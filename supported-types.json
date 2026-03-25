@@ -1,0 +1,32 @@
+[
+  {
+    "extension": "zip",
+    "label": "ZIP Archive",
+    "cracker": "zip",
+    "status": "working"
+  },
+  {
+    "extension": "pdf",
+    "label": "PDF Document",
+    "cracker": "pdf",
+    "status": "stub"
+  },
+  {
+    "extension": "docx",
+    "label": "Word Document",
+    "cracker": "docx",
+    "status": "stub"
+  },
+  {
+    "extension": "xlsx",
+    "label": "Excel Spreadsheet",
+    "cracker": "xlsx",
+    "status": "stub"
+  },
+  {
+    "extension": "txt",
+    "label": "Hash File",
+    "cracker": "hash",
+    "status": "stub"
+  }
+]

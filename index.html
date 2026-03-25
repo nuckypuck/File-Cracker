@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File Cracker</title>
+  <style>
+    :root {
+      --green: #2C5F2D;
+      --green-mid: #3a7a3b;
+      --green-light: #4e9e50;
+      --yellow: #b8960e;
+      --yellow-dim: #9a7d0a;
+      --bg: #f0f0ee;
+      --bg-card: #ffffff;
+      --bg-border: #d0d0cc;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --red: #c0392b;
+      --radius: 4px;
+      --font: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--bg-border);
+      background: var(--bg-card);
+    }
+
+    .logo-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--yellow);
+      border-radius: 50%;
+    }
+
+    header h1 {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+
+    header span {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ── Layout ── */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    /* ── Left panel ── */
+    .left {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+    }
+
+    .left-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ── Drop zone ── */
+    .drop-zone {
+      flex: 1;
+      border: 2px dashed var(--bg-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--green-light);
+      background: rgba(44, 95, 45, 0.04);
+    }
+
+    .drop-zone.has-file {
+      border-color: var(--yellow);
+      border-style: solid;
+      background: rgba(184, 150, 14, 0.04);
+    }
+
+    .drop-icon {
+      display: block;
+      margin: 0 auto 10px;
+      color: var(--text-muted);
+    }
+
+    .drop-zone h2 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .drop-zone p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .file-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      background: rgba(184, 150, 14, 0.08);
+      border: 1px solid var(--yellow-dim);
+      border-radius: var(--radius);
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--yellow);
+    }
+
+    .file-badge .remove-btn {
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .file-badge .remove-btn:hover {
+      color: var(--red);
+    }
+
+    /* ── Wordlist drop zone ── */
+    .wordlist-zone {
+      flex: 1;
+      border: 2px dashed var(--bg-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wordlist-zone:hover,
+    .wordlist-zone.drag-over {
+      border-color: var(--green-light);
+      background: rgba(44, 95, 45, 0.04);
+    }
+
+    .wordlist-zone.has-file {
+      border-color: var(--green);
+      border-style: solid;
+      background: rgba(44, 95, 45, 0.04);
+    }
+
+    .wordlist-zone h2 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .wordlist-zone p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .wordlist-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      background: rgba(44, 95, 45, 0.06);
+      border: 1px solid var(--green);
+      border-radius: var(--radius);
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    .wordlist-badge .remove-btn {
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .wordlist-badge .remove-btn:hover {
+      color: var(--red);
+    }
+
+    /* ── Buttons ── */
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 600;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-border);
+      color: var(--text);
+      padding: 7px 14px;
+      white-space: nowrap;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--green-light);
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+      padding: 11px 28px;
+      font-size: 13px;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--green-mid);
+    }
+
+    .btn-cancel {
+      background: var(--bg-card);
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 11px 28px;
+      font-size: 13px;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-cancel:hover:not(:disabled) {
+      background: rgba(192, 57, 43, 0.06);
+    }
+
+    .crack-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid var(--bg-border);
+    }
+
+    /* ── Progress ── */
+    .progress-wrap {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-wrap.visible {
+      display: flex;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 5px;
+      background: var(--bg-border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--green);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-bar.indeterminate {
+      width: 40%;
+      animation: slide 1.2s ease-in-out infinite;
+    }
+
+    @keyframes slide {
+      0% {
+        margin-left: -40%;
+      }
+
+      100% {
+        margin-left: 100%;
+      }
+    }
+
+    .progress-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ── Result ── */
+    .result-box {
+      display: none;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .result-box.visible {
+      display: block;
+    }
+
+    .result-box.success {
+      background: rgba(44, 95, 45, 0.08);
+      border: 1px solid var(--green-light);
+      color: var(--green);
+    }
+
+    .result-box.fail {
+      background: rgba(192, 57, 43, 0.06);
+      border: 1px solid var(--red);
+      color: var(--red);
+    }
+
+    .result-box .password-found {
+      font-size: 18px;
+      margin-top: 6px;
+      font-family: 'Consolas', monospace;
+      color: var(--yellow);
+    }
+
+    /* ── Right panel — supported types ── */
+    .right {
+      border-left: 1px solid var(--bg-border);
+      background: var(--bg-card);
+      padding: 20px 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .right h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+
+    .type-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .type-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      background: var(--bg);
+      border: 1px solid var(--bg-border);
+      font-size: 12px;
+    }
+
+    .type-item .ext {
+      font-family: 'Consolas', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .type-item.working .ext {
+      background: rgba(44, 95, 45, 0.1);
+      color: var(--green);
+    }
+
+    .type-item.stub .ext {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--text-muted);
+    }
+
+    .type-item .name {
+      flex: 1;
+      color: var(--text);
+    }
+
+    .type-item.stub .name {
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .type-item.working .status-dot {
+      background: var(--green-light);
+    }
+
+    .type-item.stub .status-dot {
+      background: var(--bg-border);
+    }
+
+    .right-footer {
+      margin-top: auto;
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .right-footer a {
+      color: var(--yellow-dim);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-dot"></div>
+    <h1>File Cracker</h1>
+    <span>MDX Cyber Security Society</span>
+  </header>
+
+  <main>
+    <div class="left">
+      <div class="left-content">
+
+        <!-- Drop zone: locked file -->
+        <div class="drop-zone" id="dropZone">
+          <svg class="drop-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <h2>Drop a locked file here</h2>
+          <p>or click to browse</p>
+          <div class="file-badge" id="fileBadge" style="display:none;">
+            <span id="fileLabel"></span>
+            <span class="remove-btn" id="removeFile">✕</span>
+          </div>
+        </div>
+
+        <!-- Drop zone: wordlist -->
+        <div class="wordlist-zone" id="wordlistZone">
+          <svg class="drop-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+          </svg>
+          <h2>Drop a wordlist here</h2>
+          <p>or click to browse (.txt)</p>
+          <div class="wordlist-badge" id="wordlistBadge" style="display:none;">
+            <span id="wordlistLabel"></span>
+            <span class="remove-btn" id="removeWordlist">✕</span>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-track">
+            <div class="progress-bar indeterminate" id="progressBar"></div>
+          </div>
+          <div class="progress-label" id="progressLabel">Starting...</div>
+        </div>
+
+        <!-- Result -->
+        <div class="result-box" id="resultBox"></div>
+
+      </div>
+
+      <!-- Crack button pinned to bottom -->
+      <div class="crack-row">
+        <button class="btn-cancel" id="cancelBtn" style="display:none;">Cancel</button>
+        <button class="btn-primary" id="crackBtn" disabled>Crack File</button>
+      </div>
+
+    </div>
+
+    <!-- Supported types panel -->
+    <div class="right">
+      <h3>Supported Types</h3>
+      <div class="type-list" id="typeList"></div>
+      <div class="right-footer">
+        Fork this repo, implement a stub cracker, and open a PR.<br><br>
+        <a href="https://mdxcyberhub.netlify.app">mdxcyberhub.netlify.app</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let targetFile = null
+    let wordlistFile = null
+    let cracking = false
+    let cancelled = false
+
+    // ── Load supported types into sidebar ──
+    fetch('./supported-types.json')
+      .then(r => r.json())
+      .then(types => {
+        const list = document.getElementById('typeList')
+        types.forEach(t => {
+          const el = document.createElement('div')
+          el.className = `type-item ${t.status}`
+          el.innerHTML = `
+          <span class="ext">.${t.extension}</span>
+          <span class="name">${t.label}</span>
+          <span class="status-dot"></span>
+        `
+          list.appendChild(el)
+        })
+      })
+
+    // ── Drop zone ──
+    const dropZone = document.getElementById('dropZone')
+
+    dropZone.addEventListener('click', async () => {
+      if (cracking) return
+      const p = await window.api.selectFile()
+      if (p) setFile(p)
+    })
+
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault()
+      dropZone.classList.add('drag-over')
+    })
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'))
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault()
+      dropZone.classList.remove('drag-over')
+      const f = e.dataTransfer.files[0]
+      if (f) setFile(f.path)
+    })
+
+    document.getElementById('removeFile').addEventListener('click', e => {
+      e.stopPropagation()
+      clearFile()
+    })
+
+    function setFile(p) {
+      targetFile = p
+      const name = p.split(/[\\/]/).pop()
+      document.getElementById('fileLabel').textContent = name
+      document.getElementById('fileBadge').style.display = 'inline-flex'
+      dropZone.classList.add('has-file')
+      dropZone.querySelector('h2').textContent = 'File ready'
+      dropZone.querySelector('p').textContent = 'Drop another to replace'
+      checkReady()
+    }
+
+    function clearFile() {
+      targetFile = null
+      document.getElementById('fileBadge').style.display = 'none'
+      dropZone.classList.remove('has-file')
+      dropZone.querySelector('h2').textContent = 'Drop a locked file here'
+      dropZone.querySelector('p').textContent = 'or click to browse'
+      checkReady()
+    }
+
+    // ── Wordlist drop zone ──
+    const wordlistZone = document.getElementById('wordlistZone')
+
+    wordlistZone.addEventListener('click', async () => {
+      if (cracking) return
+      const p = await window.api.selectWordlist()
+      if (p) setWordlist(p)
+    })
+
+    wordlistZone.addEventListener('dragover', e => {
+      e.preventDefault()
+      wordlistZone.classList.add('drag-over')
+    })
+    wordlistZone.addEventListener('dragleave', () => wordlistZone.classList.remove('drag-over'))
+    wordlistZone.addEventListener('drop', e => {
+      e.preventDefault()
+      wordlistZone.classList.remove('drag-over')
+      const f = e.dataTransfer.files[0]
+      if (f) setWordlist(f.path)
+    })
+
+    document.getElementById('removeWordlist').addEventListener('click', e => {
+      e.stopPropagation()
+      clearWordlist()
+    })
+
+    function setWordlist(p) {
+      wordlistFile = p
+      const name = p.split(/[\\/]/).pop()
+      document.getElementById('wordlistLabel').textContent = name
+      document.getElementById('wordlistBadge').style.display = 'inline-flex'
+      wordlistZone.classList.add('has-file')
+      wordlistZone.querySelector('h2').textContent = 'Wordlist ready'
+      wordlistZone.querySelector('p').textContent = 'Drop another to replace'
+      checkReady()
+    }
+
+    function clearWordlist() {
+      wordlistFile = null
+      document.getElementById('wordlistBadge').style.display = 'none'
+      wordlistZone.classList.remove('has-file')
+      wordlistZone.querySelector('h2').textContent = 'Drop a wordlist here'
+      wordlistZone.querySelector('p').textContent = 'or click to browse (.txt)'
+      checkReady()
+    }
+
+    // ── Ready check ──
+    function checkReady() {
+      document.getElementById('crackBtn').disabled = !(targetFile && wordlistFile && !cracking)
+    }
+
+    // ── Crack ──
+    document.getElementById('crackBtn').addEventListener('click', async () => {
+      if (!targetFile || !wordlistFile || cracking) return
+
+      const ext = targetFile.split('.').pop().toLowerCase()
+
+      cracking = true
+      cancelled = false
+      checkReady()
+      resetResult()
+      showProgress(true)
+      document.getElementById('cancelBtn').style.display = ''
+
+      window.api.removeUpdates()
+      window.api.onUpdate(handleUpdate)
+
+      const result = await window.api.startCrack({
+        filePath: targetFile,
+        wordlistPath: wordlistFile,
+        fileType: ext
+      })
+
+      cracking = false
+      showProgress(false)
+      document.getElementById('cancelBtn').style.display = 'none'
+      checkReady()
+
+      if (cancelled) {
+        cancelled = false
+      } else if (result.error) {
+        showResult(false, result.error)
+      }
+    })
+
+    // ── Cancel ──
+    document.getElementById('cancelBtn').addEventListener('click', async () => {
+      if (!cracking) return
+      cancelled = true
+      await window.api.cancelCrack()
+    })
+
+    // ── Handle stdout lines from Python cracker ──
+    // Protocol:
+    //   PROGRESS:<n>/<total>   — update progress bar
+    //   SUCCESS:<password>     — password found
+    //   FAILED                 — exhausted wordlist
+    //   ERROR:<msg>            — something went wrong
+    function handleUpdate(line) {
+      if (line.startsWith('PROGRESS:')) {
+        const [n, total] = line.slice(9).split('/').map(Number)
+        const pct = total ? Math.round((n / total) * 100) : 0
+        setProgress(pct, `Trying ${n.toLocaleString()} / ${total.toLocaleString()} passwords...`)
+
+      } else if (line.startsWith('SUCCESS:')) {
+        const pw = line.slice(8)
+        showResult(true, pw)
+
+      } else if (line === 'FAILED') {
+        showResult(false, 'Password not in wordlist.')
+
+      } else if (line.startsWith('ERROR:')) {
+        showResult(false, line.slice(6))
+      }
+    }
+
+    // ── UI helpers ──
+    function showProgress(on) {
+      const wrap = document.getElementById('progressWrap')
+      wrap.classList.toggle('visible', on)
+      if (on) {
+        const bar = document.getElementById('progressBar')
+        bar.classList.add('indeterminate')
+        bar.style.width = '0%'
+        document.getElementById('progressLabel').textContent = 'Starting...'
+      }
+    }
+
+    function setProgress(pct, label) {
+      const bar = document.getElementById('progressBar')
+      bar.classList.remove('indeterminate')
+      bar.style.width = pct + '%'
+      document.getElementById('progressLabel').textContent = label
+    }
+
+    function showResult(success, value) {
+      const box = document.getElementById('resultBox')
+      box.classList.add('visible')
+      box.className = `result-box visible ${success ? 'success' : 'fail'}`
+      if (success) {
+        box.innerHTML = `Password found<div class="password-found">${escHtml(value)}</div>`
+      } else {
+        box.innerHTML = escHtml(value)
+      }
+    }
+
+    function resetResult() {
+      const box = document.getElementById('resultBox')
+      box.className = 'result-box'
+      box.innerHTML = ''
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    }
+  </script>
+</body>
+
+</html>

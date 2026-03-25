@@ -1,0 +1,16 @@
+node_modules/
+dist/
+out/
+
+# Session notes — not for the repo
+SESSION_NOTES.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files (add your own locked files locally, don't commit them)
+*.zip
+*.pdf
+*.docx
+*.xlsx
