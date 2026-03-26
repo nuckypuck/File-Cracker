@@ -9,7 +9,7 @@
     "extension": "pdf",
     "label": "PDF Document",
     "cracker": "pdf",
-    "status": "stub"
+    "status": "working"
   },
   {
     "extension": "docx",
